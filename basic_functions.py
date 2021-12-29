@@ -2,7 +2,6 @@ import pyodbc
 import PySimpleGUI as sg
 import re
 
-
 number_regex = re.compile("^\d+$")
 date_regex = re.compile("^\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01])$")
 
@@ -13,7 +12,7 @@ def show_phones(conn):
     # res = []
     # for row in cursor:
     #     res.append([[str(element)] for element in row])
-    res = ['241412421', '4124421', '51252152'] # placeholder
+    res = ['241412421', '4124421', '51252152']  # placeholder
     phones_layout = [
         [sg.Text(f"Wszystkie telefony", size=(18, 1), font=("Arial", 11))],
     ]
@@ -150,7 +149,6 @@ def add_wizyta(conn):
     if patient == sg.WIN_CLOSED:
         return
 
-
     ward_layout = [
         [sg.Text(f"Wybierz oddzial", size=(18, 1), font=("Arial", 11))],
         [sg.Button(str(i)) for i in get_room_ward(conn)]
@@ -172,7 +170,6 @@ def add_wizyta(conn):
     window_room.close()
     if room == sg.WIN_CLOSED:
         return
-
 
     window_create = sg.Window("Wizyta", select_layout)
     while 1:
@@ -250,7 +247,9 @@ def search(conn, event):
             else:
                 search_value = search_values[0]
 
-            if search_value != "" and (column_type == 'varchar' or (column_type == 'numeric' and number_regex.match(search_value)) or (column_type == 'date' and date_regex.match(search_value))):
+            if search_value != "" and (
+                    column_type == 'varchar' or (column_type == 'numeric' and number_regex.match(search_value)) or (
+                    column_type == 'date' and date_regex.match(search_value))):
                 cursor = conn.cursor()
                 cursor.execute(f"select * from {table_name} where {column_name} = {search_value}")
                 res = []
@@ -263,12 +262,14 @@ def search(conn, event):
                         i += 1
                 res_layout = [
                                  [sg.Text(f"Wyniki wyszukiwania", size=(18, 1), font=("Arial", 11))],
+                                 [sg.Text(column_name, size=(18, 1), font=("Arial", 11))
+                                  for column_name in
+                                  list_columns(conn, event)]
                              ] + res
                 window_search.close()
                 window_res = sg.Window("Wyniki", res_layout)
                 res_event, res_values = window_res.read()
                 break
-
 
 
 def delete(conn, event):
@@ -315,9 +316,9 @@ def update(conn, event):
         row_num += 1
     columns = list_columns(conn, event, True)
     update_layout_1 = [
-                        [sg.Text(f"Dane dla {event}", size=(18, 1), font=("Arial", 11))],
-                        [sg.Text(column_name[0], size=(18, 1), font=("Arial", 11)) for column_name in columns]
-                    ] + selected_data
+                          [sg.Text(f"Dane dla {event}", size=(18, 1), font=("Arial", 11))],
+                          [sg.Text(column_name[0], size=(18, 1), font=("Arial", 11)) for column_name in columns]
+                      ] + selected_data
     update_layout_2 = [[sg.Text(f"Nowa wartosc", size=(18, 1), font=("Arial", 11))],
                        [sg.Text(f"Zwroc uwage na typy wartosci i sens relacji", font=("Arial", 11))],
                        [sg.InputText()],
@@ -357,8 +358,8 @@ def update(conn, event):
         print(condition)
         if changed_column[0] == 'Sala_numer':
             room_layout = [[sg.Text(f"Nowa wartosc", size=(18, 1), font=("Arial", 11))],
-                       [sg.Button(str(i)) for i in get_room_number_by_ward(conn, ward)]
-                       ]
+                           [sg.Button(str(i)) for i in get_room_number_by_ward(conn, ward)]
+                           ]
             window_room = sg.Window(event, room_layout)
             while 1:
                 room, room_values = window_room.read()
@@ -460,8 +461,9 @@ def update(conn, event):
                 elif update_event == "Modyfikuj":
                     val = update_values[0]
                     if val != "" and (
-                            changed_column[1] == 'varchar' or (changed_column[1] == 'numeric' and number_regex.match(val)) or (
-                            changed_column[1] == 'date' and date_regex.match(val))):
+                            changed_column[1] == 'varchar' or (
+                            changed_column[1] == 'numeric' and number_regex.match(val)) or (
+                                    changed_column[1] == 'date' and date_regex.match(val))):
                         if changed_column[1] == 'varchar' or changed_column[1] == 'date':
                             val = f"'{val}'"
                         command = f"update {event} set {changed_column[0]} = {val} where " + condition
