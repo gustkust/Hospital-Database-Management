@@ -102,7 +102,6 @@ while 1:
                         values_types = zip(values, types, names)
 
                         for value_type in values_types:
-                            if value_type[2] == 'pesel':
                             if value_type[0] == "" or (value_type[1] == 'date' and not date_regex.match(value_type[0]))\
                                     or (value_type[1] == 'numeric' and not number_regex.match(value_type[0]))\
                                     or (value_type[2] == 'pesel' and value_type[0] in [i[0] for i in get_patients_id(connection)]):
