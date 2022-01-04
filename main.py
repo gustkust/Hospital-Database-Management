@@ -147,8 +147,7 @@ while 1:
         show_phones(connection)
         print("hehe pokazuje telefony")
     if event == "Usun zalegle wizyty":
-        print("hehe usuwam wizyty")
-        # delete_old_visits(connection)
+        delete_old_visits(connection)
     if event == sg.WIN_CLOSED:
         break
 

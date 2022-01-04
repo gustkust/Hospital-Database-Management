@@ -7,12 +7,12 @@ date_regex = re.compile("^\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01])$")
 
 
 def show_phones(conn):
-    # cursor = conn.cursor()
-    # cursor.execute(f"placeholder")
-    # res = []
-    # for row in cursor:
-    #     res.append([[str(element)] for element in row])
-    res = ['241412421', '4124421', '51252152']  # placeholder
+    cursor = conn.cursor()
+    res = []
+    cursor.execute(f"select * from dbo.getPhoneNumbers()")
+    for row in cursor:
+        res.append(str(row[0]))
+    # res = ['241412421', '4124421', '51252152']  # placeholder
     phones_layout = [
         [sg.Text(f"Wszystkie telefony", size=(18, 1), font=("Arial", 11))],
     ]
@@ -26,7 +26,7 @@ def show_phones(conn):
 
 def delete_old_visits(conn):
     cursor = conn.cursor()
-    cursor.execute(f"placeholder")
+    cursor.execute(f"exec removeMadeVisits")
     conn.commit()
 
 
@@ -68,10 +68,10 @@ def get_room_ward(conn):
 
 
 def add_zgloszenie(conn):
-    columns = list_columns(conn, "Zgloszenie", get_types=True)[:-1]
+    columns = list_columns(conn, "Zgloszenie", get_types=True)[1:-1]
     select_layout = [
         [sg.Text(f"Dodaj Zgloszenie", size=(18, 1), font=("Arial", 11))],
-        [sg.Text("Zwroc uwage na typy wartosci i sens relacji", font=("Arial", 11))],
+        [sg.Text("Zwroc uwage na typy wartosci (data w formacie YYYY-MM-DD)", font=("Arial", 11))],
         [sg.Text("Atrybur", size=(18, 1), font=("Arial", 11)), sg.Text("Typ", size=(18, 1))],
         zip(
             [sg.Text(column[0], size=(20, 1)) for column in columns],
@@ -125,10 +125,10 @@ def add_zgloszenie(conn):
 
 
 def add_wizyta(conn):
-    columns = list_columns(conn, "Wizyta", get_types=True)[:-3]
+    columns = list_columns(conn, "Wizyta", get_types=True)[1:-3]
     select_layout = [
         [sg.Text(f"Dodaj Wizyte", size=(18, 1), font=("Arial", 11))],
-        [sg.Text("Zwroc uwage na typy wartosci i sens relacji", font=("Arial", 11))],
+        [sg.Text("Zwroc uwage na typy wartosci (data w formacie YYYY-MM-DD)", font=("Arial", 11))],
         [sg.Text("Atrybur", size=(18, 1), font=("Arial", 11)), sg.Text("Typ", size=(18, 1))],
         zip(
             [sg.Text(column[0], size=(20, 1)) for column in columns],
@@ -306,7 +306,8 @@ def delete(conn, event):
 def update(conn, event):
     print("update")
     read_data = read(conn, event)
-    selected_data = read(conn, event)
+    tmp = read(conn, event)
+    selected_data = [i[1:] for i in tmp]
     row_num = 0
     for row in selected_data:
         i = 0
@@ -317,10 +318,10 @@ def update(conn, event):
     columns = list_columns(conn, event, True)
     update_layout_1 = [
                           [sg.Text(f"Dane dla {event}", size=(18, 1), font=("Arial", 11))],
-                          [sg.Text(column_name[0], size=(18, 1), font=("Arial", 11)) for column_name in columns]
+                          [sg.Text(column_name[0], size=(18, 1), font=("Arial", 11)) for column_name in columns[1:]]
                       ] + selected_data
     update_layout_2 = [[sg.Text(f"Nowa wartosc", size=(18, 1), font=("Arial", 11))],
-                       [sg.Text(f"Zwroc uwage na typy wartosci i sens relacji", font=("Arial", 11))],
+                       [sg.Text(f"Zwroc uwage na typy wartosci (data w formacie YYYY-MM-DD)", font=("Arial", 11))],
                        [sg.InputText()],
                        [sg.Submit("Modyfikuj")]
                        ]
