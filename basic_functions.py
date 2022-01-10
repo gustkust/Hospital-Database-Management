@@ -242,14 +242,14 @@ def search(conn, event):
                 if column_value[0] == column_name:
                     column_type = column_value[1]
                     break
-            if column_type == 'varchar' and search_values[0] != '':
-                search_value = (f"'{search_values[0]}'")
+            if (column_type == 'varchar' or column_type == 'date') and search_values[0] != '':
+                search_value = f"'{search_values[0]}'"
             else:
                 search_value = search_values[0]
 
             if search_value != "" and (
                     column_type == 'varchar' or (column_type == 'numeric' and number_regex.match(search_value)) or (
-                    column_type == 'date' and date_regex.match(search_value))):
+                    column_type == 'date' and date_regex.match(search_value[1:-1]))):
                 cursor = conn.cursor()
                 cursor.execute(f"select * from {table_name} where {column_name} = {search_value}")
                 res = []
@@ -312,7 +312,7 @@ def update(conn, event):
     for row in selected_data:
         i = 0
         while i < len(row):
-            row[i] = sg.Button(f"{row_num + 1} {row[i]}", size=(20, 1))
+            row[i] = sg.Button(f"{row_num + 1} -> {row[i]}", size=(20, 1))
             i += 1
         row_num += 1
     columns = list_columns(conn, event, True)
@@ -340,11 +340,12 @@ def update(conn, event):
 
     update_event, update_values = window_update.read()
     if update_event != None:
-        update_event = update_event.split(" ")
+        update_event = update_event.split(" -> ")
         row_number = int(update_event[0]) - 1
         changed_value = update_event[1]
         condition = ""
         print(row_number, changed_value)
+        changed_column = [0]
         for i in range(len(columns)):
             val = read_data[row_number][i]
             if val == changed_value or val == changed_value[:-1]:

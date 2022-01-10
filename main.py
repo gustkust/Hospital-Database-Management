@@ -35,6 +35,7 @@ choose_table_layout = [
 ]
 
 editable = ["Wizyta", "Pacjent", "Zgloszenie"]
+# editable = tables
 
 editable_table_layout = [
     [sg.Text("Wybierz rodzaj danych")],
